@@ -2,39 +2,39 @@
 	import Sidebar from '../components/Sidebar.svelte';
 	import Map from '../components/Map.svelte';
 	import SplashPage from '../components/SplashPage.svelte';
-	//import { dev } from '$app/environment';
-
+  
 	let mapRef;
 	let sidebarVisible = true;
 	let showSplash = true;
-
-	function handleMapRef(event) {
-		mapRef = event.detail;
+  
+	// Define a function to fly to the passed coordinates and zoom level
+	function flyTo(coordinates = [-79.3832, 43.6532], zoomLevel = 14) {
+	  if (mapRef && typeof mapRef.flyTo === 'function') {
+		// Ensure that mapRef is an actual Maplibre instance
+		mapRef.flyTo({
+		  center: coordinates,
+		  zoom: zoomLevel,
+		  speed: 0.8,
+		  curve: 1,
+		});
+	  } else {
+		console.error('Map reference is not set properly or does not have the flyTo method');
+	  }
 	}
-
+  
+	function handleMapRef(event) {
+	  // Set the mapRef to the actual map instance from the 'mapReady' event
+	  mapRef = event.detail; // Assign the map instance received from Map.svelte
+	}
+  
 	function toggleSidebar() {
-   		sidebarVisible = !sidebarVisible;
-  	}
-	
-  // Define a function to fly to the passed coordinates and zoom level
-  function flyTo(coordinates = [-79.3832, 43.6532], zoomLevel = 14) {
-      if (mapRef) {
-          mapRef.flyTo({
-              center: coordinates,
-              zoom: zoomLevel,
-              speed: 0.8,
-              curve: 1
-          });
-      }
-  };
-
+	  sidebarVisible = !sidebarVisible;
+	}
+  
 	// Function to close the splash page
 	function closeSplash() {
-		showSplash = false;
+	  showSplash = false;
 	}
-
-    
-
   </script>
   
   <style>
@@ -47,7 +47,6 @@
 	  flex: 1;
 	  height: 100vh;
 	  overflow: hidden;
-	  
 	}
   </style>
   
@@ -61,7 +60,7 @@
 	{#if !showSplash}
 	  <Sidebar {flyTo} />
 	  <div class="map-container">
-		<Map bind:this={mapRef} on:mapReady={handleMapRef}/>
+		<Map on:mapReady={handleMapRef} />
 	  </div>
 	{/if}
   </div>
